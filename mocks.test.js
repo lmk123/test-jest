@@ -20,6 +20,18 @@ beforeEach(() => {
     obj.method()
 })
 
+test('mockFn.mockReset() 对 jest.fn() 和 jest.spyOn() 产生的 mock 函数的影响', () => {
+    normalMockFn.mockReset()
+    obj.method.mockReset()
+
+    expect(normalMockFn).toHaveBeenCalledTimes(0) // mockReset() 清除了 jest.fn() 产生的 mock 函数的调用数据
+    expect(normalMockFn()).toBeUndefined() // mockReset() 清除了 jest.fn() 产生的 mock 函数的函数定义
+
+    expect(obj.method === originFn).toBe(false) // mockReset() 没有把 obj.method 还原为原函数
+    expect(obj.method).toHaveBeenCalledTimes(0) // mockReset() **清除了** spyOn 产生的 mock 函数的调用数据
+    expect(obj.method()).toBeUndefined() // mockReset() **清除了** spyOn 产生的 mock 函数的函数定义
+})
+
 test('jest.resetAllMocks() 对 jest.fn() 和 jest.spyOn() 产生的 mock 函数的影响', () => {
     jest.resetAllMocks()
 
@@ -29,6 +41,19 @@ test('jest.resetAllMocks() 对 jest.fn() 和 jest.spyOn() 产生的 mock 函数�
     expect(obj.method === originFn).toBe(false) // resetAllMocks() 没有把 obj.method 还原为原函数
     expect(obj.method).toHaveBeenCalledTimes(0) // resetAllMocks() **清除了** spyOn 产生的 mock 函数的调用数据
     expect(obj.method()).toBeUndefined() // resetAllMocks() **清除了** spyOn 产生的 mock 函数的函数定义
+})
+
+test('mockFn.mockRestore() 对 jest.fn() 和 jest.spyOn() 产生的 mock 函数的影响', () => {
+    normalMockFn.mockRestore()
+    obj.method.mockRestore()
+
+    expect(normalMockFn).toHaveBeenCalledTimes(0) // mockRestore() 清除了 jest.fn() 产生的 mock 函数的调用数据
+    expect(normalMockFn()).toBeUndefined() // mockRestore() 清除了 jest.fn() 产生的 mock 函数的函数定义
+
+    expect(obj.method === originFn).toBe(true) // mockRestore() 将 obj.method 还原为了原函数
+    // 由于 obj.method 已经被还原为原函数，所以下方只能用变量来引用 spyOn 产生的 mock 函数
+    expect(spyOnMockFn).toHaveBeenCalledTimes(0) // mockRestore() 清除了 spyOn 产生的 mock 函数的调用数据
+    expect(spyOnMockFn()).toBeUndefined() // mockRestore() 清除了 spyOn 产生的 mock 函数的函数定义
 })
 
 test('jest.restoreAllMocks() 对 jest.fn() 和 jest.spyOn() 产生的 mock 函数的影响', () => {
